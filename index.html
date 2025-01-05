@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Example</title>
+  <!-- Add this for module support -->
+  <script type="module">
+    // Import Firebase modules at the top level of the module
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD27vqbgqJICyK5qi-pATPV3rq-seo3e4I",
+      authDomain: "soy-feliz-dia-de-reyes.firebaseapp.com",
+      databaseURL: "https://soy-feliz-dia-de-reyes-default-rtdb.firebaseio.com",
+      projectId: "soy-feliz-dia-de-reyes",
+      storageBucket: "soy-feliz-dia-de-reyes.appspot.com",
+      messagingSenderId: "480126119073",
+      appId: "1:480126119073:web:81b69aacd9edabf44614e0",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Handle form submission
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("dataForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        // Get values from form fields
+        const name = document.getElementById("name").value;
+        const phone = document.getElementById("phone").value;
+        const email = document.getElementById("email").value;
+        const acceptTerms = document.getElementById("acceptTerms").checked;
+
+        // Validate fields
+        if (name === "" || phone === "" || email === "") {
+          alert("Please fill in all the fields.");
+          return;
+        }
+
+        if (!acceptTerms) {
+          alert("You must accept the terms and conditions.");
+          return;
+        }
+
+        // Submit data to Firebase Firestore
+        try {
+          await addDoc(collection(db, "form_submissions"), {
+            name,
+            phone,
+            email,
+            timestamp: serverTimestamp(),
+          });
+          document.getElementById("message").innerText = "Form submitted successfully!";
+        } catch (error) {
+          console.error("Error submitting form: ", error);
+          document.getElementById("message").innerText = "Error submitting form.";
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+
+  <form id="dataForm">
+    <input id="name" type="text" placeholder="Name" required><br><br>
+    <input id="phone" type="text" placeholder="Phone" required><br><br>
+    <input id="email" type="email" placeholder="Email" required><br><br>
+    <label for="acceptTerms">
+      <input id="acceptTerms" type="checkbox"> I accept the terms and conditions
+    </label><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="message"></div>
+
+</body>
+</html>
